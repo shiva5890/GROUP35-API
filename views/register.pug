@@ -1,0 +1,18 @@
+html 
+    head 
+        title login form
+        link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css")
+
+    body.container 
+        h2 Login Form 
+        p Fullfil the following form
+        form(method="post")
+            label(for="Username") Username :
+            input(type="text" name="username").form-control 
+            label(for="" name='password') Password :
+            input(type="password" name="password").form-control
+            label(for="" name='name') Name:
+            input(type="text" name="name").form-control
+            label(for="" name='email') Email :
+            input(type="text" name="email").form-control
+            input(type="submit", value="Submit").btn.btn-submit.btn-primary 
