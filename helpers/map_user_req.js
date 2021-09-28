@@ -31,6 +31,8 @@ module.exports = function (user, userData) {
         user.contactInformation.phoneNumber = userData.phoneNumber
     if(userData.isMarried)
         user.isMarried = userData.isMarried
+    if(userData.image)
+        user.image = userData.image
 
     return user;
 }

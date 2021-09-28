@@ -14,7 +14,7 @@ router.route('/')
             .sort({
                 _id: -1
             })
-            .limit(2)
+            .limit()
             .skip()
             .exec(function (err, users) { // query build ga
                 if (err) {

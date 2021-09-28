@@ -4,6 +4,7 @@ const UserModel = require('../models/user.model')
 const MAP_USER_REQ = require('./../helpers/map_user_req')
 const uploader = require('./../middlewares/uploaders')
 
+
 const dbConfig = require('./../configs/db.configs')
 
 
@@ -52,12 +53,22 @@ router.get('/register', function(req,res,next){
 router.post('/register', uploader.single('image'), function(req,res,next){
   
    const data = req.body;
+   if(req.fileTypeError){
+       return next({
+           msg: 'invalid file format',
+           status: 400
+       })
+   }
    // prepare data 
-   console.log('uploaded file >>', req.file)
+//    console.log('uploaded file >>', req.file.filename)
+
+   if(req.file){
+       data.image = req.file.filename
+   }
 
    const newUser = new UserModel({});
    // newUser is a mongoose object
-    const newMapUser = MAP_USER_REQ(newUser,data )
+    const newMapUser = MAP_USER_REQ(newUser,data)
    // useUser is mongoose object so call mongoose method for db operation
    newUser.save(function (err, done) {
        if (err) {
