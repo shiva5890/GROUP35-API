@@ -6,12 +6,17 @@ const path = require('path');
 
 const app = express(); // server create garxa express bata
 
+
+// app.use('/hello',function(req,res){
+//    res.send('hello nepal')
+// })
+
 require('./db_init')
 
 
 const pug = require('pug')
 app.set('view engine', pug);
-app.set('views', path.join(process.cwd(),'views'))
+app.set('files', path.join(process.cwd(),'uploads'))
 
 // import application level middleware 
 const notFound = require('./middlewares/notFound')
@@ -34,9 +39,10 @@ app.use(morgan('dev'))
 // console.log('Path directory ', __dirname); // jun file ma use vaako xa tyo file samma path dinxa
 // console.log('root directory >>', process.cwd()); // application ko  root folder samma path dinxa
 
+
 app.use(express.urlencoded({
     extended: true
-}))
+})) // yo parser req.body ka kura lai parse garxa
 
 app.use(express.json({
     extended: true

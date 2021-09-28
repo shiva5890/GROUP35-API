@@ -2,112 +2,105 @@ const router = require('express').Router();
 
 const { ObjectID } = require('mongodb');
 const dbConfig = require('./../configs/db.configs')
-
-function connection(cb){
-    dbConfig.MongoClient.connect(dbConfig.conxnURL, {
-        useUnifiedTopology: true
-    }, function(err,client){
-        if(err){
-            cb(err)
-        }else{
-            const db = client.db(dbConfig.dbName);
-            cb(null,db)
-        }
-    })
-}
+const UserModel = require('./../models/user.model')
+const MAP_USER_REQ = require('./../helpers/map_user_req')
+const uploader = require('./../middlewares/uploaders')
 
 router.route('/')
     .get(function(req,res,next){
-        connection(function(err,db){
-            if(err){
-                return next(err);
-            }
-            db
-                .collection('users')
-                .find({})
-                .toArray(function(err,done){
-                    if(err){
-                        return next(err)
-                    }
-                    res.json(done)
-                })
-        })
+        var condition = {};
+        UserModel
+            .find(condition)
+            .sort({
+                _id: -1
+            })
+            .limit(2)
+            .skip()
+            .exec(function (err, users) { // query build ga
+                if (err) {
+                    return next(err);
+                }
+                res.json(users);
+            })
+       
     })
     .post(function(req,res,next){
 
     })
 
-    router.route('/search')
+router.route('/search')
     .get(function(req,res,next){
         res.send('This is from search user handler')
     })
     .post(function(req,res,next){
 
     })
-    .put(function(req,res,next){
 
-    })
-    .delete(function(req,res,next){
-
-    })
 
 
 router.route('/:id')
     .get(function(req,res,next){
-        var id = req.params.id
-        connection(function(err,db){
-           if(err){
-               return next(err)
-           }
-           db.collection('users').find({
-               _id : dbConfig.OID(id)
-           })
-           .toArray(function(err,user){
-               if(err){
-                   return next(err)
-               }
-               res.json(user)
-           })
-       })
+        var id = req.params.id;
+        UserModel.findById(id, function (err, user) {
+            if (err) {
+                return next(err);
+            }
+            if (!user) {
+                return next({
+                    msg: 'User Not Found',
+                    status: 404
+                })
+            }
+            res.json(user);
+        })
+
+       
     })
     .post(function(req,res,next){
 
     })
     .put(function(req,res,next){
-        connection(function(err,db){
-            if(err){
-                return next(err)
-            }
-            db.collection('users').update({
-                _id: new dbConfig.OID(req.params.id)
-            },{
-                $set: req.body
-            }, function(err,updated){
+       const id = req.params.id;
+       const data = req.body;
+       UserModel.findById(id,function(err, user){
+           if(err){
+               return next(err);
+           }
+           if(!user){
+               return next({
+                   msg: 'User Not Found',
+                   status: 404
+               })
+           }
+           const updatedUser = MAP_USER_REQ(user, data)
+            // (data file upload garera data prepare garnu paxa)
+            updatedUser.save(function(err,updated){
                 if(err){
                     return next(err)
                 }
                 res.json(updated)
             })
-        })
+       })
     })
     .delete(function(req,res,next){
-        const id = req.params.id
-        connection(function(err,db){
+        var id = req.params.id;
+        UserModel.findById(id,function(err,user){
             if(err){
-                return next(err)
+                return next(err);
             }
-            db.collection('users').remove({
-                _id: new dbConfig.OID(id)
-            })
-            .then(function(done){
-                res.json(done)
-            })
-            .catch(function(err){
-                res.json(err)
+            if(!user){
+                return next({
+                    msg: 'User not found',
+                    status: 404
+                })
+            }
+            user.remove(function(err,removed){
+                if(err){
+                    return next(err)
+                }
+                res.json(removed)
             })
         })
     })
-
-
 
 module.exports = router;

@@ -3,7 +3,8 @@ const dbConfog = require('./configs/db.configs')
 
 
 mongoose.connect(dbConfog.conxnURL+'/'+dbConfog.dbName,{
-    useUnifiedTopology:true
+    useUnifiedTopology:true,
+    useNewUrlParser: true 
 }, function(err,done){
     if(err){
         console.log('Error in connecting database >>')
