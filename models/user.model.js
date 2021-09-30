@@ -48,7 +48,7 @@ const UserSchema = mongoose.Schema({
         }
     },
     role: {
-        type: Number, // 1 for admin, 2 for general user, 3 for....
+        type: Number, // mongoo1 for admin, 2 for general user, 3 for....
         default: 2
     },
     isMarried: Boolean,

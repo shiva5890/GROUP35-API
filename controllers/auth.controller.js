@@ -3,10 +3,21 @@ const router = express.Router();
 const UserModel = require('../models/user.model')
 const MAP_USER_REQ = require('./../helpers/map_user_req')
 const uploader = require('./../middlewares/uploaders')
-
+const passwordHash = require('password-hash');
+const jwt = require('jsonwebtoken');
+const config = require('../configs');
 
 const dbConfig = require('./../configs/db.configs')
 
+function generateToken(data){
+    return jwt.sign({
+        _id: data._id,
+        role:data.role,
+        name: data.username
+    }, config.JWT_SECRET, {
+        expiresIn: '2days'
+    })
+}
 
 router.get('/',function(req,res,next){
    
@@ -25,20 +36,31 @@ router.post('/login', function(req,res,next){
           return next({
               msg: "Invalid Username",
               status: 400
-          })
+          })    
       }
-      if (user.status !== 'active') {
-          return next({
-              msg: 'Your account is disabled please contact IT Department for support',
-              status: 400
-          })
-      }
-
+      var isMatched = passwordHash.verify(req.body.password, user.password);
+          if(!isMatched){
+              return next({
+                  msg: 'invalid password',
+                  status: 404
+              })
+          }
+          if (user.status !== 'active') {
+              return next({
+                  msg: 'Your account is disabled please contact IT Department for support',
+                  status: 400
+              })
+          }
+     
       // if user
       // check status
       // password verfication
       // token generation
-      res.json(user);
+      var token = generateToken(user)
+      res.json({
+          user: user,
+          token: token
+      });
   })
   .catch(function (err) {
       next(err)
@@ -68,9 +90,10 @@ router.post('/register', uploader.single('image'), function(req,res,next){
 
    const newUser = new UserModel({});
    // newUser is a mongoose object
-    const newMapUser = MAP_USER_REQ(newUser,data)
+    const newMapUser = MAP_USER_REQ(newUser,data);
+    newMapUser.password = passwordHash.generate(req.body.password)
    // useUser is mongoose object so call mongoose method for db operation
-   newUser.save(function (err, done) {
+   newMapUser.save(function (err, done) {
        if (err) {
            return next(err);
        }

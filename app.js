@@ -14,14 +14,11 @@ const app = express(); // server create garxa express bata
 require('./db_init')
 
 
-const pug = require('pug')
-app.set('view engine', pug);
-app.set('files', path.join(process.cwd(),'uploads'))
-
 // import application level middleware 
 const notFound = require('./middlewares/notFound')
 const ticket = require('./middlewares/checkTicket')
 const validate = require('./middlewares/validateTicket')
+const authenticate = require('./middlewares/authenticate')
 
 
 // importing router level middleware 
@@ -56,7 +53,7 @@ app.use('/file', express.static('uploads/images')) // external serve
 
 
 app.use('/auth',authRouter)
-app.use('/user',userRouter)
+app.use('/user',authenticate,userRouter)
 app.use('/notify',notifyRouter)
 app.use('/review', reviewRouter)
 
