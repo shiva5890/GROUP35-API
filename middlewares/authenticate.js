@@ -32,6 +32,10 @@ module.exports = function (req, res, next) {
         // req.user = decoded;
         // next(); // proceed to another middleware
 
+
+
+        // ############ code for verify user deleted or not #########
+
         UserModel.findById(decoded._id, function(err,user){
             if(err){
                 return next(err)
@@ -42,7 +46,7 @@ module.exports = function (req, res, next) {
                     status: '400'
                 })
             }
-            res.user = user;
+            req.user = user;
             next();
         })
 

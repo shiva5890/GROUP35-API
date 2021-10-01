@@ -74,7 +74,8 @@ router.route('/:id')
            }
            const updatedUser = MAP_USER_REQ(user, data)
             // (data file upload garera data prepare garnu paxa)
-            updatedUser.updated_by = user.username;
+            // console.log('req user >> ', req.user);
+            updatedUser.updated_by = req.user.username;
             // console.log(user.updated_by)
             updatedUser.save(function(err,updated){
                 if(err){
@@ -89,6 +90,12 @@ router.route('/:id')
         UserModel.findById(id,function(err,user){
             if(err){
                 return next(err);
+            }
+            if(req.user.role !== 1){
+                return next({
+                    msg: "You dont't have access this operation",
+                    status: 203
+                })
             }
             if(!user){
                 return next({
