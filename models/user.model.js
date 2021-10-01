@@ -52,7 +52,8 @@ const UserSchema = mongoose.Schema({
         default: 2
     },
     isMarried: Boolean,
-    image: String
+    image: String,
+    updated_by: String
 }, {
     timestamps: true
 })

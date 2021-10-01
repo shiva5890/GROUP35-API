@@ -74,6 +74,8 @@ router.route('/:id')
            }
            const updatedUser = MAP_USER_REQ(user, data)
             // (data file upload garera data prepare garnu paxa)
+            updatedUser.updated_by = user.username;
+            // console.log(user.updated_by)
             updatedUser.save(function(err,updated){
                 if(err){
                     return next(err)

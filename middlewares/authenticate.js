@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('./../configs');
+const UserModel = require('../models/user.model')
 
 module.exports = function (req, res, next) {
     let token;
@@ -24,10 +25,26 @@ module.exports = function (req, res, next) {
         if (err) {
             return next(err);
         }
-        console.log('token verification successfull', decoded);
+        // console.log('token verification successfull', decoded);?
         // TODO
         // add logged in user information in request object(req)
         // so that every other middleware will have loggin in user's information
-        next(); // proceed to another middleware
+        // req.user = decoded;
+        // next(); // proceed to another middleware
+
+        UserModel.findById(decoded._id, function(err,user){
+            if(err){
+                return next(err)
+            }
+            if(!user){
+                return next({
+                    msg: 'User deleted from sysytem',
+                    status: '400'
+                })
+            }
+            res.user = user;
+            next();
+        })
+
     })
 }
