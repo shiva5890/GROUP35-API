@@ -25,8 +25,9 @@ const authenticate = require('./middlewares/authenticate')
 const authRouter = require('./controllers/auth.controller');
 const userRouter = require('./controllers/user.controller')
 const notifyRouter = require('./controllers/notification.controller')
-const reviewRouter = require('./controllers/review.controller');
+const reviewRouter = require('./modules/auth/reviews/reviews.route')
 const { urlencoded } = require('express');
+
 
 
 
@@ -55,7 +56,7 @@ app.use('/file', express.static('uploads/images')) // external serve
 app.use('/auth',authRouter)
 app.use('/user',authenticate,userRouter)
 app.use('/notify',notifyRouter)
-app.use('/review', reviewRouter)
+app.use('/reviews', authenticate, reviewRouter)
 
 // handle 404 error 
 app.use(notFound)
